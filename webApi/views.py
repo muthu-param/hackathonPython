@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json, jwt
+import json
+import jwt
 from django.shortcuts import render
 
 # Create your views here.
@@ -46,13 +47,13 @@ def login(request):
         payload = {
             'userId': user.userId,
             'email': user.email,
-            'role':user.role,
-            'userName':user.userName
+            'role': user.role,
+            'userName': user.userName
         }
 
         payload['token'] = jwt.encode(payload, SECRET_KEY)
         # Send mail to user
-        # sendMail(user.user_name, user.email)
+        # sendMail(user.userName, user.email)
 
         return login_success_response(payload)
     else:

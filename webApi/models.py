@@ -13,6 +13,7 @@ class User(models.Model):
     password = models.CharField(max_length=200)
     email = models.CharField(default=None, null=True, max_length=50)
     status = models.CharField(max_length=10)
+    createdBy = models.CharField(max_length=10, default=None)
     role = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

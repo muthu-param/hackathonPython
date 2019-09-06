@@ -51,7 +51,7 @@ def sendMail(username, email):
         message = render_to_string('django_email_template.html', ctx)
 
         send_mail(subject, message, 'divumtab@gmail.com', [email],
-                  fail_silently=True)
+                  fail_silently=False)
         return 1
     except Exception as e:
         return 0
