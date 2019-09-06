@@ -8,7 +8,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from Common.views import *
 from django_base_template.settings import SECRET_KEY
-from webApi.models import User
+from webApi.models import Room
 from webApi.services import sendMail
 
 
@@ -24,27 +24,22 @@ def index(request):
 
 @api_view(['POST'])
 def addRoom(request):
-    success = {
-        message:"Room Added Successfully"
-    }
-    fail = {}
-    fail['status'] = 500
     print request.META
     return JsonResponse(success)
     data = json.loads(request.body.decode('utf-8'))
 
     if 'roomId' not in data:
         fail['msg'] = "Please provide room id"
-        return login_failure_response(fail)
+        return failure_response(fail)
     elif 'roomName' not in data:
         fail['msg'] = "Please provide room name"
-        return login_failure_response(fail)
+        return failure_response(fail)
     elif 'utilities' not in data:
         fail['msg'] = "Please provide room utilities"
-        return login_failure_response(fail)
+        return failure_response(fail)
     elif 'size' not in data:
         fail['msg'] = "Please provide room size"
-        return login_failure_response(fail)
+        return failure_response(fail)
 
     payload = {
         'roomId': data.roomId,
@@ -53,26 +48,15 @@ def addRoom(request):
         'size':data.size
     }
 
-    return login_success_response(success)
+    return success_response(success)
 
 
 @api_view(['GET'])
-def get_login_data(request, *args, **kwargs):
-    success = {}
-    success['status'] = 200
-    success['msg'] = 'Token getting success'
+def getRooms(request, *args, **kwargs):
 
-    fail = {}
-    fail['status'] = 500
-
-    status, auth_header = header_check(request)
-
-    if status != True:
-        fail['msg'] = auth_header
-        return failure_response(fail)
     try:
-        res = token_extract(auth_header)
-        return success_response(res)
+        rooms = Room.objects.all().values()
+        return success_response(list(rooms))
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)

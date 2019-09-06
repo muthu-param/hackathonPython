@@ -28,3 +28,18 @@ class Role(models.Model):
 
     class Meta:
         db_table = "role"
+
+class Room(models.Model):
+    roomId = models.AutoField(primary_key=True)
+    roomName = models.CharField(max_length=200)
+    size = models.IntegerField()
+    utilityAC = models.BooleanField()
+    utilitySmTv = models.BooleanField()
+    utilityWater = models.BooleanField()
+    utilityWBoard = models.BooleanField()
+    utilityProjector = models.BooleanField()
+    createdBy = models.CharField()
+
+    class Meta:
+        db_table = "room"
+
