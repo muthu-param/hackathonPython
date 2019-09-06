@@ -27,7 +27,7 @@ def index(request):
 def login(request):
     success = {}
     fail = {}
-    fail['status'] = 500
+    fail['status'] = 401
     data = json.loads(request.body.decode('utf-8'))
 
     if 'email' not in data:

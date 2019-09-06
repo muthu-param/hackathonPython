@@ -17,7 +17,6 @@ from webApi.services import sendMail
 def addUser(request):
     responses = {}
     try:
-
         data = json.loads(request.body.decode('utf-8'))
         user = User()
         user.userId = data['userId']
@@ -29,6 +28,19 @@ def addUser(request):
         user.status = 'Active'
         user.save()
         responses["status"] = "User Added Successfully"
+        sendMail(user.userName, user.email)
         return success_response(responses)
     except Exception as err:
         return failure_response(err.message)
+
+
+@api_view(['GET'])
+def getUsers(request, *args, **kwargs):
+    fail = {}
+    try:
+        users = User.objects.all().values(
+            'userName', 'userId', 'role', 'createdBy', 'email')
+        return success_response(list(users))
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json, jwt
+import json
+import jwt
 from django.shortcuts import render
 
 # Create your views here.
@@ -44,14 +45,38 @@ def addRoom(request):
     room.utilityWBoard = data['utilityWBoard']
     room.utilityProjector = data['utilityProjector']
     room.createdBy = data['createdBy']
-    room.status = 'Active' 
+    room.status = 'Active'
     room.save()
     responses["status"] = "Room Added Successfully"
     return success_response(responses)
 
+
+@api_view(['POST'])
+def updateRoom(request):
+    fail = {}
+    responses = {
+        "msg": "!Successfully updated"
+    }
+    data = json.loads(request.body.decode('utf-8'))
+    if 'roomId' not in data:
+        fail['msg'] = "Please provide room Id"
+        return failure_response(fail)
+    elif 'roomName' not in data:
+        fail['msg'] = "Please provide room name"
+        return failure_response(fail)
+    elif 'size' not in data:
+        fail['msg'] = "Please provide room size"
+        return failure_response(fail)
+
+    room = Room.objects.filter(roomId=data['roomId']).update(
+        roomName=data['roomName'], size=data['size'], utilityAC=data['utilityAC'], utilitySmTv=data['utilitySmTv'], utilityWater=data['utilityWater'], utilityWBoard=data['utilityWBoard'], utilityProjector=data['utilityProjector'])
+
+    return success_response(responses)
+
+
 @api_view(['GET'])
 def getRooms(request, *args, **kwargs):
-
+    fail = {}
     try:
         rooms = Room.objects.all().values()
         return success_response(list(rooms))

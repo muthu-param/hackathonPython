@@ -22,6 +22,7 @@ class User(models.Model):
     class Meta:
         db_table = "user"
 
+
 class Role(models.Model):
     roleId = models.AutoField(primary_key=True)
     roleName = models.CharField(max_length=50)
@@ -29,6 +30,7 @@ class Role(models.Model):
 
     class Meta:
         db_table = "role"
+
 
 class Room(models.Model):
     roomId = models.AutoField(primary_key=True)
@@ -44,4 +46,3 @@ class Room(models.Model):
 
     class Meta:
         db_table = "room"
-

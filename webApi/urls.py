@@ -20,8 +20,12 @@ urlpatterns = [
 
     url(r'^addUser', user.addUser, name='addUser'),
 
+    url(r'^getUsers', user.getUsers, name='getUsers'),
+
     url(r'^addRoom', room.addRoom, name='addRoom'),
 
-    url(r'^getRooms', room.getRooms, name='getRooms'),    
+    url(r'^updateRoom', room.updateRoom, name='updateRoom'),    
+
+    url(r'^getRooms', room.getRooms, name='getRooms'),
 
 ]
