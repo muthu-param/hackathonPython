@@ -27,34 +27,34 @@ def login(request):
     success = {}
     fail = {}
     fail['status'] = 500
-    print request.META
-    return JsonResponse(success)
     data = json.loads(request.body.decode('utf-8'))
 
-    if 'user_name' not in data:
-        fail['msg'] = "Please provide User Name"
+    if 'email' not in data:
+        fail['msg'] = "Please provide emailId"
         return login_failure_response(fail)
     elif 'password' not in data:
         fail['msg'] = "Please provide Password"
         return login_failure_response(fail)
 
     try:
-        user = User.objects.get(user_name=data['user_name'], password=data['password'])
+        user = User.objects.get(email=data['email'], password=data['password'])
     except User.DoesNotExist:
         fail['msg'] = "Invalid username/password"
         return login_failure_response(fail)
 
     if user:
         payload = {
-            'id': user.user_id,
+            'userId': user.userId,
             'email': user.email,
+            'role':user.role,
+            'userName':user.userName
         }
 
-        success['token'] = jwt.encode(payload, SECRET_KEY)
+        payload['token'] = jwt.encode(payload, SECRET_KEY)
         # Send mail to user
-        sendMail(user.user_name, user.email)
+        # sendMail(user.user_name, user.email)
 
-        return login_success_response(success)
+        return login_success_response(payload)
     else:
         fail['msg'] = "Invalid credentials"
         return login_failure_response(fail)
