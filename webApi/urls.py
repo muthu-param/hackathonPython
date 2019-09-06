@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from webApi import views, services, role, user
+from webApi import views, services, role, user, room
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -19,5 +19,9 @@ urlpatterns = [
     url(r'^getRole', role.getRole, name='getRole'),
 
     url(r'^addUser', user.addUser, name='addUser'),
+
+    url(r'^addRoom', room.addRoom, name='addRoom'),
+
+    url(r'^getRooms', room.getRooms, name='getRooms'),    
 
 ]

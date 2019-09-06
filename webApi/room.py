@@ -24,32 +24,30 @@ def index(request):
 
 @api_view(['POST'])
 def addRoom(request):
-    print request.META
-    return JsonResponse(success)
+    fail = {}
+    responses = {}
     data = json.loads(request.body.decode('utf-8'))
 
-    if 'roomId' not in data:
-        fail['msg'] = "Please provide room id"
-        return failure_response(fail)
-    elif 'roomName' not in data:
+    if 'roomName' not in data:
         fail['msg'] = "Please provide room name"
-        return failure_response(fail)
-    elif 'utilities' not in data:
-        fail['msg'] = "Please provide room utilities"
         return failure_response(fail)
     elif 'size' not in data:
         fail['msg'] = "Please provide room size"
         return failure_response(fail)
 
-    payload = {
-        'roomId': data.roomId,
-        'roomName': data.roomName,
-        'utilities':data.utilities,
-        'size':data.size
-    }
-
-    return success_response(success)
-
+    room = Room()
+    room.roomName = data['roomName']
+    room.size = data['size']
+    room.utilityAC = data['utilityAC']
+    room.utilitySmTv = data['utilitySmTv']
+    room.utilityWater = data['utilityWater']
+    room.utilityWBoard = data['utilityWBoard']
+    room.utilityProjector = data['utilityProjector']
+    room.createdBy = data['createdBy']
+    room.status = 'Active' 
+    room.save()
+    responses["status"] = "Room Added Successfully"
+    return success_response(responses)
 
 @api_view(['GET'])
 def getRooms(request, *args, **kwargs):

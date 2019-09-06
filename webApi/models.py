@@ -39,7 +39,8 @@ class Room(models.Model):
     utilityWater = models.BooleanField()
     utilityWBoard = models.BooleanField()
     utilityProjector = models.BooleanField()
-    createdBy = models.CharField()
+    createdBy = models.CharField(max_length=10, default=None)
+    status = models.CharField(max_length=10)
 
     class Meta:
         db_table = "room"
