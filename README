@@ -1,0 +1,13 @@
+django-admin startproject project-Name
+
+
+python manage.py startapp app-Name
+
+
+python manage.py makemigrations webApi
+
+
+python manage.py migrate webApi 0001
+
+
+python mange.py runserver 0.0.0.0:8080
