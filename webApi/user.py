@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json, jwt
+import json
+import jwt
 from django.shortcuts import render
 
 # Create your views here.
@@ -39,7 +40,8 @@ def login(request):
         return login_failure_response(fail)
 
     try:
-        user = User.objects.get(user_name=data['user_name'], password=data['password'])
+        user = User.objects.get(
+            user_name=data['user_name'], password=data['password'])
     except User.DoesNotExist:
         fail['msg'] = "Invalid username/password"
         return login_failure_response(fail)
@@ -80,3 +82,24 @@ def get_login_data(request, *args, **kwargs):
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
+
+@api_view(['POST'])
+def addUser(request):
+    responses = {}
+    try:
+
+        data = json.loads(request.body.decode('utf-8'))
+
+        user = User()
+        user.userId = data['userId']
+        user.userName = data['userName']
+        user.password = data['password']
+        user.email = data['email']
+        user.role = data['role']
+        user.status = 'Active'
+        user.save()
+        responses["status"] = "User Added Successfully"
+        return success_response(responses)
+    except Exception as err:
+        return failure_response(err.message)
