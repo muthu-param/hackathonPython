@@ -58,3 +58,15 @@ class Booking(models.Model):
 
     class Meta:
         db_table = "booking"
+
+class Blocking(models.Model):
+    blockingId = models.AutoField(primary_Key=True)
+    roomId = models.ForeignKey(Room, on_delete=models.CASCADE)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE)
+    startTime = models.DateTimeField(null=True)
+    endTime = models.DateTimeField(null=True)
+    bookingDate = models.DateTimeField(auto_now=True,null=True)
+    status = models.IntegerField()
+
+    class Meta:
+        db_table = "booking"

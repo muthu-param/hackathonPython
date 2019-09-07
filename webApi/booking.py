@@ -71,7 +71,7 @@ def addBooking(roomId,userId,start,end,date,agenda):
 
 def isUserAuthorized(userId):
     user = User.objects.get(userId__exact=userId)
-    history = Booking.object.filter(userId__exact=userId).values("historyStates")
+    history = Booking.objects.filter(userId__exact=userId).values("historyStates")
 
     if user.role > 2:
         return false
@@ -84,6 +84,15 @@ def isUserAuthorized(userId):
 def getBookings():
      try:
         bookings = Booking.objects.all().values()
+        return success_response(list(bookings))
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)
+
+@api_view(['GET'])
+def getBookingsById(userId):
+     try:
+        bookings = Booking.objects.filter(userId__exact=userId)
         return success_response(list(bookings))
     except Exception as e:
         fail['msg'] = str(e)
