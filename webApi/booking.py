@@ -9,7 +9,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from Common.views import *
 from django_base_template.settings import SECRET_KEY
-from webApi.models import Booking, Room, User
+from webApi.models import Booking, Room, User, MoM
 from webApi.models import User
 from webApi.services import sendMail
 
@@ -50,15 +50,6 @@ def addBooking(request):
     responses["status"] = "Room Added Successfully"
     return success_response(responses)
 
-# def isBookingAllowed():
-#     fail = {}
-#     responses = {}
-#     data = json.loads(request.body.decode('utf-8'))
-#     roomBookings = Bookings.objects.filter(roomId__exact=roomId).filter(endTime__lt=data.startTime).
-#     if isUserAuthorized(userId):
-#         for index in roomBookings:
-#             if data.startTime <
-
 
 @api_view(['GET'])
 def userAuthorizedForBooking(request):
@@ -94,13 +85,50 @@ def getBookings(request, *args, **kwargs):
         return failure_response(fail)
 
 
-@api_view(['post'])
+@api_view(['GET'])
 def getBookingsById(request):
     fail = {}
     try:
         userId = request.GET['userId']
-        bookings = Booking.objects.filter(userId=userId)
-        return success_response(list(bookings))
+        # bookings = Booking.objects.filter(userId_id=userId)
+        # return success_response(list(bookings))
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
+
+@api_view(['POST'])
+def addMoM(request):
+    fail = {}
+    responses = {}
+    data = json.loads(request.body.decode('utf-8'))
+
+    if 'bookingId' not in data:
+        fail['msg'] = "Please provide booking Id"
+        return failure_response(fail)
+    elif 'userId' not in data:
+        fail['msg'] = "Please provide user id"
+        return failure_response(fail)
+    elif 'roomId' not in data:
+        fail['msg'] = "Please provide room Id"
+        return failure_response(fail)
+    elif 'aboutMoM' not in data:
+        fail['msg'] = "Please provide aboutMoM"
+        return failure_response(fail)
+    elif 'remarks' not in data:
+        fail['msg'] = "Please provide remarks"
+        return failure_response(fail)
+    elif 'projectTitle' not in data:
+        fail['msg'] = "Please provide projectTitle"
+        return failure_response(fail)
+
+    mom = MoM()
+    mom.bookingId = Booking.objects.get(bookingId=data['bookingId'])
+    mom.userId = User.objects.get(userId=data['userId'])
+    mom.roomId = Room.objects.get(roomId=data['roomId'])
+    mom.aboutMoM = data['aboutMoM']
+    mom.remarks = data['remarks']
+    mom.projectTitle = data['projectTitle']
+    mom.save()
+    responses["status"] = "Room MoM Successfully"
+    return success_response(responses)

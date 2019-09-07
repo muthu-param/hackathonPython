@@ -71,4 +71,17 @@ class Blocking(models.Model):
     status = models.IntegerField()
 
     class Meta:
-        db_table = "booking"
+        db_table = "blocking"
+
+class MoM(models.Model):
+    MoMId = models.AutoField(primary_key=True)
+    bookingId = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True)
+    roomId = models.ForeignKey(Room, on_delete=models.CASCADE)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE)
+    projectTitle = models.CharField(max_length=100)
+    aboutMoM = models.CharField(max_length=300)
+    remarks = models.CharField(max_length=100)
+    submittingDate = models.DateTimeField(auto_now=True,null=True)
+
+    class Meta:
+        db_table = "mom"

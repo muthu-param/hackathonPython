@@ -28,12 +28,14 @@ urlpatterns = [
 
     url(r'^getRooms', room.getRooms, name='getRooms'),
 
+    url(r'^addMoM', booking.addMoM, name='addMoM'),    
+
     url(r'^bookRoom', booking.addBooking, name='bookRoom'),
 
     url(r'^userAuthorizedForBooking/$', booking.userAuthorizedForBooking, name='userAuthorizedForBooking'),
 
     url(r'^getBookings', booking.getBookings, name='getBookings'),
 
-    url(r'^getBookingsById/$', booking.getBookingsById, name='getBookingsById'),
+    url(r'^getBookingsById', booking.getBookingsById, name='getBookingsById'),
 
 ]

@@ -41,6 +41,6 @@ def addBlock(request):
     return success_response(responses)
 
 
-# def updateBlockStatus(blockingId, newStatus):
-#     Blocking.objects.filter(
-#         blockingId__exact=blockingId).update(status=newStatus)
+def updateBlockStatus(blockingId, newStatus):
+    Blocking.objects.filter(
+        blockingId__exact=blockingId).update(status=newStatus)
