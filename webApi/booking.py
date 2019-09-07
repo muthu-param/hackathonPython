@@ -97,3 +97,18 @@ def getBookingsById(userId):
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
+@api_view(['GET'])
+def getBookingsByDate(date):
+     try:
+        bookings = Booking.objects.filter(startTime__date=datetime.date(date))
+        data={}
+        for i in bookings:
+            data[i["roomId"]] = []
+        for i in bookings:
+            data[i["roomId"]].append({"roomName": i["roomName"], "bookingId": i["bookingId]", "startTime": i["startTime"], "endTime": i["endTime"], "bookingDate": i["bookingDate"] })
+
+        return success_response(list(bookings))
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)
