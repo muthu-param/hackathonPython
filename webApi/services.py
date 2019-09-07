@@ -41,16 +41,37 @@ def image_upload(request):
         return failure_response(fail)
 
 
-def sendMail(username, email):
+def sendMail(username, email, password):
     try:
-        subject = "Django Testing"
+        subject = "Welcome to our Param.network"
         ctx = {
-            'username': username
+            'username': username,
+            'password': password
         }
 
         message = render_to_string('django_email_template.html', ctx)
 
         send_mail(subject, message, 'divumtab@gmail.com', [email],
+                  fail_silently=False)
+        return 1
+    except Exception as e:
+        return 0
+
+
+def sendMailToAll(name, userId, mailIds, startTime, endTime):
+    try:
+        subject = "Meeting Room Booked"
+        ctx = {
+            'roomName': name,
+            'userId': userId,
+            'startTime': startTime,
+            'endTime': endTime
+        }
+
+        message = render_to_string(
+            'django_email_template_for_booking.html', ctx)
+
+        send_mail(subject, message, 'divumtab@gmail.com', mailIds,
                   fail_silently=False)
         return 1
     except Exception as e:

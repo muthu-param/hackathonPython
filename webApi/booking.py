@@ -11,8 +11,9 @@ from Common.views import *
 from django_base_template.settings import SECRET_KEY
 from webApi.models import Booking, Room, User, MoM
 from webApi.models import User
-from webApi.services import sendMail
+from webApi.services import sendMail, sendMailToAll
 from datetime import datetime, timedelta
+from django.db.models import Q
 
 
 @api_view(['POST'])
@@ -49,6 +50,19 @@ def addBooking(request):
     booking.historyState = 0
     booking.save()
     responses["status"] = "Room Added Successfully"
+
+    # Mail
+    mailId = User.objects.filter(~Q(role=3)).values('email')
+    mailIds = []
+    for i in mailId:
+        mailIds.append(i["email"])
+
+    roomData = Room.objects.get(roomId=data['roomId'])
+    userData = User.objects.get(userId=data['userId'])
+
+    sendMailToAll(roomData.roomName, userData.userName,
+                  mailIds, booking.startTime, booking.endTime)
+
     return success_response(responses)
 
 
@@ -132,6 +146,8 @@ def addMoM(request):
     mom.remarks = data['remarks']
     mom.projectTitle = data['projectTitle']
     mom.save()
+
+    Booking.objects.filter(bookingId=data['bookingId']).update(historyState=2)
     responses["status"] = "Room MoM Successfully"
     return success_response(responses)
 
@@ -141,12 +157,21 @@ def getBookingsByDate(request):
     data = json.loads(request.body.decode('utf-8'))
     fail = {}
     try:
+
         from_date = datetime.strptime(data['date'], '%Y-%m-%d')
         to_date = datetime.strptime(data['date'], '%Y-%m-%d')
         last_time = to_date.replace(hour=23, minute=59, second=59)
 
-        bookings = Booking.objects.filter(startTime__range=[from_date, last_time]).values()
+        bookings = Booking.objects.filter(
+            startTime__range=[from_date, last_time]).values()
         return success_response(list(bookings))
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
+# from datetime import datetime
+# import time
+# def datetime_from_utc_to_local(utc_datetime):
+#    now_timestamp = time.time()
+#    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
+#    return utc_datetime + offset

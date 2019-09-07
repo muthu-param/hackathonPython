@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Common',
     'webApi',
     'log',
+    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'log.middleware.ResponseMiddleware',
 
+]
+
+CRON_CLASSES = [
+    "cron.cronjobs.RegenerateAuthToken",
 ]
 
 ROOT_URLCONF = 'django_base_template.urls'

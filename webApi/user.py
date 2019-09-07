@@ -28,7 +28,7 @@ def addUser(request):
         user.status = 'Active'
         user.save()
         responses["status"] = "User Added Successfully"
-        sendMail(user.userName, user.email)
+        sendMail(user.userName, user.email, user.password)
         return success_response(responses)
     except Exception as err:
         return failure_response(err.message)
