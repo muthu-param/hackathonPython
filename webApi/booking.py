@@ -12,6 +12,7 @@ from django_base_template.settings import SECRET_KEY
 from webApi.models import Booking, Room, User, MoM
 from webApi.models import User
 from webApi.services import sendMail
+from datetime import datetime, timedelta
 
 
 @api_view(['POST'])
@@ -90,26 +91,13 @@ def getBookingsById(request):
     fail = {}
     try:
         userId = request.GET['userId']
-        # bookings = Booking.objects.filter(userId_id=userId)
-        # return success_response(list(bookings))
-    except Exception as e:
-        fail['msg'] = str(e)
-        return failure_response(fail)
-
-@api_view(['GET'])
-def getBookingsByDate(date):
-     try:
-        bookings = Booking.objects.filter(startTime__date=datetime.date(date))
-        data={}
-        for i in bookings:
-            data[i["roomId"]] = []
-        for i in bookings:
-            data[i["roomId"]].append({"roomName": i["roomName"], "bookingId": i["bookingId]", "startTime": i["startTime"], "endTime": i["endTime"], "bookingDate": i["bookingDate"] })
-
+        print userId
+        bookings = Booking.objects.filter(userId_id=userId).values()
         return success_response(list(bookings))
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
 
 @api_view(['POST'])
 def addMoM(request):
@@ -146,3 +134,19 @@ def addMoM(request):
     mom.save()
     responses["status"] = "Room MoM Successfully"
     return success_response(responses)
+
+
+@api_view(['POST'])
+def getBookingsByDate(request):
+    data = json.loads(request.body.decode('utf-8'))
+    fail = {}
+    try:
+        from_date = datetime.strptime(data['date'], '%Y-%m-%d')
+        to_date = datetime.strptime(data['date'], '%Y-%m-%d')
+        last_time = to_date.replace(hour=23, minute=59, second=59)
+
+        bookings = Booking.objects.filter(startTime__range=[from_date, last_time]).values()
+        return success_response(list(bookings))
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)
