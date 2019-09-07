@@ -40,4 +40,6 @@ urlpatterns = [
 
     url(r'^ByDate', booking.getBookingsByDate, name='getBookingsByDate'),
 
+    url(r'^getMoM/$', booking.getMoM, name='getMoM'),
+
 ]

@@ -14,6 +14,8 @@ from webApi.models import User
 from webApi.services import sendMail, sendMailToAll
 from datetime import datetime, timedelta
 from django.db.models import Q
+import re
+from textblob import TextBlob
 
 
 @api_view(['POST'])
@@ -138,18 +140,32 @@ def addMoM(request):
         fail['msg'] = "Please provide projectTitle"
         return failure_response(fail)
 
-    mom = MoM()
-    mom.bookingId = Booking.objects.get(bookingId=data['bookingId'])
-    mom.userId = User.objects.get(userId=data['userId'])
-    mom.roomId = Room.objects.get(roomId=data['roomId'])
-    mom.aboutMoM = data['aboutMoM']
-    mom.remarks = data['remarks']
-    mom.projectTitle = data['projectTitle']
-    mom.save()
+    momData = MoM.objects.filter(bookingId=data['bookingId']).values()
+    print momData
+    if len(momData) == 0:
 
-    Booking.objects.filter(bookingId=data['bookingId']).update(historyState=2)
-    responses["status"] = "Room MoM Successfully"
-    return success_response(responses)
+        mom = MoM()
+        mom.bookingId = Booking.objects.get(bookingId=data['bookingId'])
+        mom.userId = User.objects.get(userId=data['userId'])
+        mom.roomId = Room.objects.get(roomId=data['roomId'])
+        mom.aboutMoM = data['aboutMoM']
+        mom.remarks = data['remarks']
+        mom.projectTitle = data['projectTitle']
+        sentiment, polarity = get_tweet_sentiment(data['aboutMoM'])
+        print polarity
+        mom.sentiment = sentiment
+        mom.polarity = polarity * 100
+        mom.save()
+
+        Booking.objects.filter(
+            bookingId=data['bookingId']).update(historyState=2)
+        responses["status"] = "Room MoM Successfully"
+        return success_response(responses)
+    else:
+        fail = {
+            "error": "Already Existing"
+        }
+        return success_response(fail)
 
 
 @api_view(['POST'])
@@ -169,9 +185,40 @@ def getBookingsByDate(request):
         fail['msg'] = str(e)
         return failure_response(fail)
 
-# from datetime import datetime
-# import time
-# def datetime_from_utc_to_local(utc_datetime):
-#    now_timestamp = time.time()
-#    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
-#    return utc_datetime + offset
+
+def clean_tweet(tweet):
+    ''' 
+    Utility function to clean tweet text by removing links, special characters 
+    using simple regex statements. 
+    '''
+    return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t]) |(\w+:\/\/\S+)", " ", tweet).split())
+
+
+def get_tweet_sentiment(msg):
+    ''' 
+    Utility function to classify sentiment of passed tweet 
+    using textblob's sentiment method 
+    '''
+    # create TextBlob object of passed tweet text
+    analysis = TextBlob(clean_tweet(msg))
+    # set sentiment
+    polarity = analysis.sentiment.polarity
+    print polarity
+    if polarity > 0:
+        return ('positive', polarity)
+    elif polarity == 0:
+        return ('neutral', polarity)
+    else:
+        return ('negative', polarity)
+
+
+@api_view(['GET'])
+def getMoM(request):
+    fail = {}
+    try:
+        momId = request.GET['bookingId']
+        momData = MoM.objects.filter(bookingId=momId).values()
+        return success_response(list(momData))
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)

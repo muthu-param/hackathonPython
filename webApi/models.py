@@ -82,6 +82,8 @@ class MoM(models.Model):
     aboutMoM = models.CharField(max_length=300)
     remarks = models.CharField(max_length=100)
     submittingDate = models.DateTimeField(auto_now=True,null=True)
+    sentiment = models.CharField(max_length=100, null=True)
+    polarity = models.IntegerField(null=True)    
 
     class Meta:
         db_table = "mom"
