@@ -46,3 +46,17 @@ class Room(models.Model):
 
     class Meta:
         db_table = "room"
+
+
+class Booking(models.Model):
+    bookingId = models.AutoField(primary_key=True)
+    roomId = models.ForeignKey(Room, on_delete=models.CASCADE)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE)
+    startTime = models.DateTimeField(null=True)
+    endTime = models.DateTimeField(null=True)
+    bookingDate = models.DateTimeField(auto_now=True, null=True)
+    agenda = models.TextField(blank=True)
+    historyState = models.IntegerField()
+
+    class Meta:
+        db_table = "booking"

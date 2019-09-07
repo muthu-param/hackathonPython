@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from webApi import views, services, role, user, room
+from webApi import views, services, role, user, room, booking
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -27,5 +27,12 @@ urlpatterns = [
     url(r'^updateRoom', room.updateRoom, name='updateRoom'),    
 
     url(r'^getRooms', room.getRooms, name='getRooms'),
+
+    url(r'^bookRoom', booking.addBooking, name='bookRoom'),
+
+    url(r'^userAuthorizedForBooking/$', booking.userAuthorizedForBooking, name='userAuthorizedForBooking'),
+
+    url(r'^getBookings', booking.getBookings, name='getBookings'),
+
 
 ]
