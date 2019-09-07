@@ -34,5 +34,6 @@ urlpatterns = [
 
     url(r'^getBookings', booking.getBookings, name='getBookings'),
 
+    url(r'^getBookingsById/$', booking.getBookingsById, name='getBookingsById'),
 
 ]

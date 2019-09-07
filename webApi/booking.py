@@ -92,3 +92,15 @@ def getBookings(request, *args, **kwargs):
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
+
+@api_view(['post'])
+def getBookingsById(request):
+    fail = {}
+    try:
+        userId = request.GET['userId']
+        bookings = Booking.objects.filter(userId=userId)
+        return success_response(list(bookings))
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)
