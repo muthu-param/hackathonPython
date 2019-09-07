@@ -1,29 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json, jwt
+import json
+import jwt
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
 from Common.views import *
 from django_base_template.settings import SECRET_KEY
-from webApi.models import Booking
+from webApi.models import Booking, Room, User, MoM
 from webApi.models import User
 from webApi.services import sendMail
 
 
-def index(request):
-    try:
-        res = {}
-        res['status'] = 200
-        res['message'] = 'Working Fine...!'
-        return success_response(res)
-    except Exception as e:
-        return failure_response(e.message)
-
 @api_view(['POST'])
-def addBooking(roomId,userId,start,end,date,agenda):
+def addBooking(request):
     fail = {}
     responses = {}
     data = json.loads(request.body.decode('utf-8'))
@@ -37,7 +29,7 @@ def addBooking(roomId,userId,start,end,date,agenda):
     elif 'startTime' not in data:
         fail['msg'] = "Please provide start time"
         return failure_response(fail)
-    elif 'end time' not in data:
+    elif 'endTime' not in data:
         fail['msg'] = "Please provide end time"
         return failure_response(fail)
     elif 'bookingDate' not in data:
@@ -48,52 +40,58 @@ def addBooking(roomId,userId,start,end,date,agenda):
         return failure_response(fail)
 
     booking = Booking()
-    booking.roomId = data['roomId']
-    booking.userId = data['userId']
+    booking.roomId = Room.objects.get(roomId=data['roomId'])
+    booking.userId = User.objects.get(userId=data['userId'])
     booking.startTime = data['startTime']
     booking.endTime = data['endTime']
-    booking.bookingDate = data['bookingDate']
-    booking.agenda = data['agenda'] 
+    booking.agenda = data['agenda']
     booking.historyState = 0
     booking.save()
     responses["status"] = "Room Added Successfully"
     return success_response(responses)
 
-# def isBookingAllowed():
-#     fail = {}
-#     responses = {}
-#     data = json.loads(request.body.decode('utf-8'))
-#     roomBookings = Bookings.objects.filter(roomId__exact=roomId).filter(endTime__lt=data.startTime).
-#     if isUserAuthorized(userId):
-#         for index in roomBookings:
-#             if data.startTime < 
-
-
-def isUserAuthorized(userId):
-    user = User.objects.get(userId__exact=userId)
-    history = Booking.objects.filter(userId__exact=userId).values("historyStates")
-
-    if user.role > 2:
-        return false
-    for index in history:
-        if index == 1:
-            return false  
-    return true
 
 @api_view(['GET'])
-def getBookings():
-     try:
+def userAuthorizedForBooking(request):
+    responses = {
+        "msg": "!Success"
+    }
+    fail = {}
+    userId = request.GET['userId']
+    user = User.objects.get(userId=userId)
+
+    history = Booking.objects.filter(
+        userId=userId).values('historyState')
+
+    if user.role > 2:
+        fail['msg'] = "Can't book the room"
+        return failure_response(fail)
+
+    for index in history:
+        if index["historyState"] == 1:
+            fail['msg'] = "Please provide MoM for previous booking"
+            return failure_response(fail)
+    return success_response(responses)
+
+
+@api_view(['GET'])
+def getBookings(request, *args, **kwargs):
+    fail = {}
+    try:
         bookings = Booking.objects.all().values()
         return success_response(list(bookings))
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
 
+
 @api_view(['GET'])
-def getBookingsById(userId):
-     try:
-        bookings = Booking.objects.filter(userId__exact=userId)
-        return success_response(list(bookings))
+def getBookingsById(request):
+    fail = {}
+    try:
+        userId = request.GET['userId']
+        # bookings = Booking.objects.filter(userId_id=userId)
+        # return success_response(list(bookings))
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
@@ -112,3 +110,39 @@ def getBookingsByDate(date):
     except Exception as e:
         fail['msg'] = str(e)
         return failure_response(fail)
+
+@api_view(['POST'])
+def addMoM(request):
+    fail = {}
+    responses = {}
+    data = json.loads(request.body.decode('utf-8'))
+
+    if 'bookingId' not in data:
+        fail['msg'] = "Please provide booking Id"
+        return failure_response(fail)
+    elif 'userId' not in data:
+        fail['msg'] = "Please provide user id"
+        return failure_response(fail)
+    elif 'roomId' not in data:
+        fail['msg'] = "Please provide room Id"
+        return failure_response(fail)
+    elif 'aboutMoM' not in data:
+        fail['msg'] = "Please provide aboutMoM"
+        return failure_response(fail)
+    elif 'remarks' not in data:
+        fail['msg'] = "Please provide remarks"
+        return failure_response(fail)
+    elif 'projectTitle' not in data:
+        fail['msg'] = "Please provide projectTitle"
+        return failure_response(fail)
+
+    mom = MoM()
+    mom.bookingId = Booking.objects.get(bookingId=data['bookingId'])
+    mom.userId = User.objects.get(userId=data['userId'])
+    mom.roomId = Room.objects.get(roomId=data['roomId'])
+    mom.aboutMoM = data['aboutMoM']
+    mom.remarks = data['remarks']
+    mom.projectTitle = data['projectTitle']
+    mom.save()
+    responses["status"] = "Room MoM Successfully"
+    return success_response(responses)

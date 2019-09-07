@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json, jwt
+import json
+import jwt
 from django.shortcuts import render
 
 # Create your views here.
@@ -13,17 +14,8 @@ from webApi.models import User
 from webApi.services import sendMail
 
 
-def index(request):
-    try:
-        res = {}
-        res['status'] = 200
-        res['message'] = 'Working Fine...!'
-        return success_response(res)
-    except Exception as e:
-        return failure_response(e.message)
-
 @api_view(['POST'])
-def addBlock(roomId,userId,startTime,endTime,bookingDate):
+def addBlock(request):
     if 'roomId' not in data:
         fail['msg'] = "Please provide room id"
         return failure_response(fail)
@@ -33,11 +25,8 @@ def addBlock(roomId,userId,startTime,endTime,bookingDate):
     elif 'startTime' not in data:
         fail['msg'] = "Please provide start time"
         return failure_response(fail)
-    elif 'end time' not in data:
+    elif 'endTime' not in data:
         fail['msg'] = "Please provide end time"
-        return failure_response(fail)
-    elif 'bookingDate' not in data:
-        fail['msg'] = "Please provide booking date"
         return failure_response(fail)
 
     blocking = Blocking()
@@ -46,10 +35,12 @@ def addBlock(roomId,userId,startTime,endTime,bookingDate):
     blocking.startTime = data['startTime']
     blocking.endTime = data['endTime']
     blocking.bookingDate = data['bookingDate']
-    blocking.status = 1 ##blocked
+    blocking.status = 1  # blocked
     booking.save()
-    responses["status"] = "Room Added Successfully"
+    responses["status"] = "Room blocked Successfully"
     return success_response(responses)
 
-def updateBlockStatus(blockingId,newStatus):
-    Blocking.objects.filter(blockingId__exact=blockingId).update(status=newStatus)
+
+def updateBlockStatus(blockingId, newStatus):
+    Blocking.objects.filter(
+        blockingId__exact=blockingId).update(status=newStatus)

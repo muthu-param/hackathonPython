@@ -43,12 +43,12 @@ def success_response(success_res):
 
 def login_failure_response(res):
     response = {}
-    response['status-code'] = 200
+    response['status-code'] = 401
     response['error'] = 1
     response['sys_msg'] = ''
     response['message'] = 'Login Failed'
     response['content'] = res
-    return JsonResponse(response, status=200, safe=False, content_type="application/json")
+    return JsonResponse(response, status=401, safe=False, content_type="application/json")
 
 
 def login_success_response(res):
