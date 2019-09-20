@@ -57,6 +57,7 @@ class Booking(models.Model):
     bookingDate = models.DateTimeField(auto_now=True, null=True)
     agenda = models.TextField(blank=True)
     historyState = models.IntegerField()
+    participant = models.CharField(max_length=20, null=True)
 
     class Meta:
         db_table = "booking"

@@ -68,6 +68,28 @@ def addBooking(request):
     return success_response(responses)
 
 
+@api_view(['POST'])
+def addParticipant(request):
+    fail = {}
+    responses = {}
+    data = json.loads(request.body.decode('utf-8'))
+    try:
+        if 'userId' not in data:
+            fail['msg'] = "Please provide user id"
+            return failure_response(fail)
+        elif 'bookingId' not in data:
+            fail['msg'] = "Please provide booking Id"
+            return failure_response(fail)
+
+        booking = Booking.objects.filter(bookingId=data['bookingId']).update(
+            participant=data['participant'])
+        responses["status"] = "Participant Added Successfully"
+        return success_response(responses)
+    except Exception as e:
+        fail['msg'] = str(e)
+        return failure_response(fail)
+
+
 @api_view(['GET'])
 def userAuthorizedForBooking(request):
     responses = {
@@ -76,20 +98,22 @@ def userAuthorizedForBooking(request):
     fail = {}
     userId = request.GET['userId']
     user = User.objects.get(userId=userId)
-
     history = Booking.objects.filter(
         userId=userId).values('historyState')
 
     if user.role > 2:
         fail['msg'] = "Can't book the room"
         return failure_response(fail)
-
-    for index in history:
-        if index["historyState"] == 1:
-            fail['msg'] = "Please provide MoM for previous booking"
-            return failure_response(fail)
-    return success_response(responses)
-
+    if len(history) > 0:
+        for index in history:
+            if index["historyState"] == 1:
+                fail['msg'] = "Please provide MoM for previous booking"
+                return failure_response(fail)
+        return success_response(responses)
+    else :
+        fail['msg'] = "No Booking are avaliable"
+        return failure_response(fail)
+    
 
 @api_view(['GET'])
 def getBookings(request, *args, **kwargs):
@@ -141,7 +165,6 @@ def addMoM(request):
         return failure_response(fail)
 
     momData = MoM.objects.filter(bookingId=data['bookingId']).values()
-    print momData
     if len(momData) == 0:
 
         mom = MoM()
@@ -152,7 +175,6 @@ def addMoM(request):
         mom.remarks = data['remarks']
         mom.projectTitle = data['projectTitle']
         sentiment, polarity = get_tweet_sentiment(data['aboutMoM'])
-        print polarity
         mom.sentiment = sentiment
         mom.polarity = polarity * 100
         mom.save()
@@ -165,7 +187,7 @@ def addMoM(request):
         fail = {
             "error": "Already Existing"
         }
-        return success_response(fail)
+        return failure_response(fail)
 
 
 @api_view(['POST'])

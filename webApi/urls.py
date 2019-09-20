@@ -24,15 +24,16 @@ urlpatterns = [
 
     url(r'^addRoom', room.addRoom, name='addRoom'),
 
-    url(r'^updateRoom', room.updateRoom, name='updateRoom'),    
+    url(r'^updateRoom', room.updateRoom, name='updateRoom'),
 
     url(r'^getRooms', room.getRooms, name='getRooms'),
 
-    url(r'^addMoM', booking.addMoM, name='addMoM'),    
+    url(r'^addMoM', booking.addMoM, name='addMoM'),
 
     url(r'^bookRoom', booking.addBooking, name='bookRoom'),
 
-    url(r'^userAuthorizedForBooking/$', booking.userAuthorizedForBooking, name='userAuthorizedForBooking'),
+    url(r'^userAuthorizedForBooking/$', booking.userAuthorizedForBooking,
+        name='userAuthorizedForBooking'),
 
     url(r'^getBookings', booking.getBookings, name='getBookings'),
 
@@ -41,5 +42,7 @@ urlpatterns = [
     url(r'^ByDate', booking.getBookingsByDate, name='getBookingsByDate'),
 
     url(r'^getMoM/$', booking.getMoM, name='getMoM'),
+
+    url(r'^addParticipant', booking.addParticipant, name='addParticipant'),
 
 ]
